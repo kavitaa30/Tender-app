@@ -1,0 +1,116 @@
+/* ===== NAVBAR WRAPPER ===== */
+.navbar-glass {
+  height: 72px;
+  width: 100%;
+  padding: 0 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(
+    90deg,
+    rgba(15, 28, 63, 0.95),
+    rgba(30, 58, 138, 0.95)
+  );
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ===== BRAND (LEFT) ===== */
+.brand {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  letter-spacing: 0.6px;
+  user-select: none;
+}
+
+.brand span {
+  color: #93c5fd;
+}
+
+/* ===== RIGHT LINKS WRAPPER ===== */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ===== LINKS ===== */
+.nav-links a,
+.nav-links span {
+  color: #e5e7eb;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+/* ===== HOVER UNDERLINE ANIMATION ===== */
+.nav-links a::after,
+.nav-links span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 0%;
+  height: 2px;
+  background: #93c5fd;
+  transition: width 0.35s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links span:hover::after {
+  width: 100%;
+}
+
+.nav-links a:hover,
+.nav-links span:hover {
+  color: #ffffff;
+}
+
+/* ===== ACTIVE LINK ===== */
+.nav-links a.active {
+  color: #93c5fd;
+}
+
+/* ===== LOGOUT BUTTON ===== */
+.logout-btn {
+  color: #fca5a5 !important;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  color: #fecaca !important;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .navbar-glass {
+    padding: 0 24px;
+    height: 64px;
+  }
+
+  .brand {
+    font-size: 22px;
+  }
+
+  .nav-links {
+    gap: 18px;
+  }
+
+  .nav-links a,
+  .nav-links span {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,40 @@
+/* FULL BACKGROUND FIX */
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* React root covers screen */
+#root {
+  background-image: url("/background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Page wrappers transparent */
+.register-wrapper,
+.login-wrapper,
+.tender-wrapper,
+.report-wrapper {
+  min-height: 100vh;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cards readable */
+.register-card,
+.login-container,
+.tender-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  padding: 20px;
+}
