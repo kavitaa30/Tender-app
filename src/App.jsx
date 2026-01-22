@@ -4,6 +4,7 @@ import Register from "./components/Auth/Register";
 import TenderForm from "./components/Tender/TenderForm";
 import Report from "./components/Report/Report";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./components/Profile/Profile"; // ✅ NEW
 
 function App() {
   return (
@@ -31,6 +32,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Report />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ✅ PROFILE PAGE */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

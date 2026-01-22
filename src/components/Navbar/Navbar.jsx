@@ -1,48 +1,49 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(null);
 
-  const protectedNav = (path) => {
-    if (!user) {
-      alert("Please login first");
-      navigate("/login");
-    } else {
-      navigate(path);
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+
+    if (userId) {
+      fetch(`http://localhost:5000/api/users/${userId}`)
+        .then((res) => res.json())
+        .then((data) => setUser(data))
+        .catch(() => setUser(null));
     }
-  };
+  }, []);
 
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("userId");
+    setUser(null);
     navigate("/login");
   };
 
   return (
     <nav className="navbar-glass">
-      {/* LEFT */}
       <div className="brand" onClick={() => navigate("/")}>
         Tender<span>App</span>
       </div>
 
-      {/* RIGHT */}
       <div className="nav-links">
+        {/* Login & Register always visible */}
         <NavLink to="/login">Login</NavLink>
         <NavLink to="/register">Register</NavLink>
 
-        <span onClick={() => protectedNav("/tender")}>
-          Tender Form
-        </span>
-
-        <span onClick={() => protectedNav("/report")}>
-          Report
-        </span>
-
+        {/* Extra links only when user is logged in */}
         {user && (
-          <span className="logout-btn" onClick={logout}>
-            Logout
-          </span>
+          <>
+            <span onClick={() => navigate("/tender")}>Tender Form</span>
+            <span onClick={() => navigate("/report")}>Report</span>
+            <span onClick={() => navigate("/profile")}>Profile</span>
+            <span className="logout-btn" onClick={logout}>
+              Logout
+            </span>
+          </>
         )}
       </div>
     </nav>

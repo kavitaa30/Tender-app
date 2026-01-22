@@ -1,85 +1,87 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 import { generateCaptcha } from "../../utils/captcha";
 import "./Auth.css";
-import Navbar from "../Navbar/Navbar";
-
 
 const Login = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const [captcha, setCaptcha] = useState("");
+  const [captcha, setCaptcha] = useState(generateCaptcha());
   const [inputCaptcha, setInputCaptcha] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    setCaptcha(generateCaptcha());
-  }, []);
-
-  const handleLogin = () => {
-    if (!user) {
-      alert("Please register first");
+  const handleLogin = async () => {
+    if (inputCaptcha !== captcha) {
+      alert("Invalid captcha");
       return;
     }
 
-    if (
-      email === user.email &&
-      password === user.password &&
-      inputCaptcha === captcha
-    ) {
-      navigate("/tender");
-    } else {
-      alert("Invalid credentials or captcha");
+    try {
+      const res = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.msg);
+        return;
+      }
+
+      // ✅ Save _id in localStorage
+      localStorage.setItem("userId", data._id);
+      navigate("/tender"); // direct navigate to tender
+    } catch (err) {
+      alert("Server error");
     }
   };
 
   return (
-     <>
-    <Navbar />
-    <div className="auth-wrapper">
-      <div className="auth-container">
-
-        {/* LEFT */}
-        <div className="auth-panel left">
-          <h2>Hello, Welcome!</h2>
-          <p>Don't have an account?</p>
-          <button onClick={() => navigate("/register")}>Register</button>
-        </div>
-
-        {/* RIGHT */}
-        <div className="auth-panel right">
-          <h2>Login</h2>
-
-          <input
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <div className="captcha-row">
-            <span>{captcha}</span>
-            <button onClick={() => setCaptcha(generateCaptcha())}>↻</button>
+    <>
+      <Navbar />
+      <div className="auth-wrapper">
+        <div className="auth-container">
+          <div className="auth-panel left">
+            <h2>Hello, Welcome!</h2>
+            <p>Don't have an account?</p>
+            <button onClick={() => navigate("/register")}>Register</button>
           </div>
 
-          <input
-            placeholder="Enter Captcha"
-            onChange={(e) => setInputCaptcha(e.target.value)}
-          />
+          <div className="auth-panel right">
+            <h2>Login</h2>
 
-          <button className="main-btn" onClick={handleLogin}>
-            Login
-          </button>
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <div className="captcha-row">
+              <span>{captcha}</span>
+              <button onClick={() => setCaptcha(generateCaptcha())}>↻</button>
+            </div>
+
+            <input
+              placeholder="Enter Captcha"
+              value={inputCaptcha}
+              onChange={(e) => setInputCaptcha(e.target.value)}
+            />
+
+            <button className="main-btn" onClick={handleLogin}>
+              Login
+            </button>
+          </div>
         </div>
-
       </div>
-    </div>
     </>
   );
 };
