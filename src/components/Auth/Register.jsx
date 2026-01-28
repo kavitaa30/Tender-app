@@ -6,6 +6,9 @@ import "./Auth.css";
 const Register = () => {
   const navigate = useNavigate();
 
+  const mobileRegex = /^[5-9]\d{9}$/;
+
+
   const [form, setForm] = useState({
     fname: "",
     mname: "",
@@ -27,6 +30,11 @@ const Register = () => {
       alert("Password mismatch");
       return;
     }
+    if (!mobileRegex.test(form.mobile)) {
+  alert("Mobile number must be 10 digits");
+  return;
+}
+
 
     try {
       const res = await fetch("http://localhost:5000/api/users/register", {
@@ -73,7 +81,17 @@ const Register = () => {
             <input name="mname" placeholder="Middle Name" onChange={handleChange} />
             <input name="lname" placeholder="Last Name" onChange={handleChange} />
             <input value={fullName} placeholder="Full Name" disabled />
-            <input name="mobile" placeholder="Mobile Number" onChange={handleChange} />
+           <input
+             name="mobile"
+             placeholder="Mobile Number"
+             maxLength="10"
+             value={form.mobile}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              setForm({ ...form, mobile: value });
+            }}
+           />
+
             <input name="email" placeholder="Email" onChange={handleChange} />
             <input type="password" name="password" placeholder="Password" onChange={handleChange} />
             <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} />

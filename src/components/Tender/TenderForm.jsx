@@ -3,112 +3,21 @@ import { useNavigate } from "react-router-dom";
 import "./TenderForm.css";
 import Navbar from "../Navbar/Navbar";
 
-/* ===== LOCATION DATA (DEPENDENT DROPDOWNS) ===== */
-const locationData = {
-  Maharashtra: {
-    Pune: ["Haveli", "Mulshi", "Shirur", "Baramati", "Daund"],
-    Mumbai: ["Andheri", "Borivali", "Kurla", "Dadar", "Malad"],
-    Nashik: ["Sinnar", "Igatpuri", "Niphad", "Yeola", "Chandwad"],
-    Nagpur: ["Nagpur Urban", "Nagpur Rural", "Hingna", "Kamptee", "Parseoni"],
-  },
 
-  Gujarat: {
-    Ahmedabad: ["Daskroi", "Sanand", "Detroj", "Bavla", "Ranpur"],
-    Surat: ["Choryasi", "Palsana", "Olpad", "Mandvi", "Kamrej"],
-    Vadodara: ["Savli", "Padra", "Karjan", "Dabhoi", "Vaghodia"],
-  },
-
-  Karnataka: {
-    Bengaluru: [
-      "Bangalore North",
-      "Bangalore South",
-      "Yelahanka",
-      "Anekal",
-      "Kengeri",
-    ],
-    Mysuru: ["Mysore", "Nanjangud", "Hunsur", "Krishnarajanagara", "Tirumakudal"],
-    Hubballi: ["Hubballi Rural", "Dharwad", "Kalghatgi", "Kundgol"],
-  },
-
-  MadhyaPradesh: {
-    Indore: ["Mhow", "Sanwer", "Depalpur", "Hatod", "Sawer"],
-    Bhopal: ["Huzur", "Berasia", "Phanda", "Kolar", "Govindpura"],
-    Jabalpur: ["Patan", "Sihora", "Panagar", "Majholi", "Shahpura"],
-  },
-
-  Rajasthan: {
-    Jaipur: ["Amber", "Sanganer", "Jamwa Ramgarh", "Chomu", "Phulera"],
-    Udaipur: ["Girwa", "Mavli", "Kherwara", "Salumber", "Lasadiya"],
-    Jodhpur: ["Osian", "Bilara", "Bhopalgarh", "Phalodi", "Shergarh"],
-  },
-
-  UttarPradesh: {
-    Lucknow: [
-      "Bakshi Ka Talab",
-      "Malihabad",
-      "Sarojini Nagar",
-      "Mohanlalganj",
-      "Nigohan",
-    ],
-    Kanpur: ["Kanpur Nagar", "Bilhaur", "Ghatampur", "Kalyanpur", "Bithoor"],
-    Noida: ["Dadri", "Jewar", "Dankaur", "Greater Noida", "Bisrakh"],
-    Prayagraj: ["Soraon", "Karchhana", "Meja", "Phulpur", "Handia"],
-  },
-
-  Bihar: {
-    Patna: ["Danapur", "Paliganj", "Barh", "Masaurhi", "Bikram"],
-    Gaya: ["Tekari", "Sherghati", "Wazirganj", "Manpur", "Belaganj"],
-  },
-
-  WestBengal: {
-    Kolkata: [
-      "Alipore",
-      "Ballygunge",
-      "Salt Lake",
-      "Behala",
-      "Dum Dum",
-    ],
-    Howrah: ["Uluberia", "Domjur", "Bagnan", "Shibpur", "Amta"],
-    Siliguri: ["Matigara", "Naxalbari", "Kharibari", "Phansidewa"],
-  },
-
-  TamilNadu: {
-    Chennai: [
-      "Tondiarpet",
-      "Velachery",
-      "Guindy",
-      "Mylapore",
-      "Tambaram",
-    ],
-    Coimbatore: ["Pollachi", "Mettupalayam", "Sulur", "Valparai", "Annur"],
-    Madurai: ["Melur", "Thirumangalam", "Usilampatti", "Vadipatti", "Peraiyur"],
-  },
-
-  Telangana: {
-    Hyderabad: [
-      "Secunderabad",
-      "Charminar",
-      "Kukatpally",
-      "Gachibowli",
-      "LB Nagar",
-    ],
-    Warangal: ["Hanamkonda", "Kazipet", "Parkal", "Wardhannapet"],
-  },
-
-  Delhi: {
-    Delhi: [
-      "Central Delhi",
-      "South Delhi",
-      "North Delhi",
-      "East Delhi",
-      "West Delhi",
-    ],
-  },
-};
+const editId = localStorage.getItem("editId");
+const user = JSON.parse(localStorage.getItem("user"));
+const mobileRegex = /^[5-9]\d{9}$/;
 
 
 const TenderForm = () => {
   const navigate = useNavigate();
+
+  const [locationData, setLocationData] = useState({});
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [cities, setCities] = useState([]);
+
+ 
 
   const initialForm = {
     type: "",
@@ -153,36 +62,117 @@ const TenderForm = () => {
 
   /* ===== SUBMIT ===== */
   const handleSubmit = async () => {
-    if (
-      !form.type ||
-      !form.fullName ||
-      !form.mobile ||
-      !form.email ||
-      !form.goodsType ||
-      !form.license ||
-      !form.gst
-    ) {
-      alert("Please fill all required fields");
-      return;
-    }
+  if (
+    !form.type ||
+    !form.fullName ||
+    !form.mobile ||
+    !form.email ||
+    !form.goodsType ||
+    !form.license ||
+    !form.gst
+  ) {
+    alert("Please fill all required fields");
+    return;
+  }
 
+  if (!mobileRegex.test(form.mobile)) {
+  alert("Mobile number must be 10 digits");
+  return;
+}
+
+
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+    alert("Please login again");
+    return;
+  }
+
+  try {
+    const url = editId
+      ? `http://localhost:5000/api/tenders/${editId}`
+      : "http://localhost:5000/api/tenders";
+
+    const method = editId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, userId }),
+    });
+
+    if (!res.ok) throw new Error("Failed");
+
+    alert(editId ? "Tender Updated Successfully" : "Tender Submitted Successfully");
+
+    localStorage.removeItem("editId");
+    navigate("/report");
+  } catch (err) {
+    alert("Error saving tender");
+  }
+};
+
+
+
+const [form, setForm] = useState(initialForm);
+useEffect(() => {
+  if (!editId) return;
+
+  const fetchTender = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/tenders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/tenders/single/${editId}`
+      );
+      const data = await res.json();
+      setForm({
+  ...initialForm,
+  ...data
+});
 
-      if (!res.ok) throw new Error("Failed");
-
-      alert("✅ Tender Submitted Successfully");
-      navigate("/report");
     } catch (err) {
-      alert("❌ Error submitting tender");
+      console.log(err);
     }
   };
-const [form, setForm] = useState(initialForm);
-const [editIndex, setEditIndex] = useState(null);
+
+  fetchTender();
+}, []);
+
+
+// ======================== STATES ========================
+// Fetch all states
+useEffect(() => {
+  fetch("http://localhost:5000/api/locations/states")
+    .then(res => res.json())
+    .then(data => setStates(data))
+    .catch(err => console.log(err));
+    
+}, []);
+
+// Fetch districts when state changes
+useEffect(() => {
+  if (!form.state) return;
+
+  fetch(`http://localhost:5000/api/locations/districts/${form.state}`)
+    .then(res => res.json())
+    .then(data => setDistricts(data))
+    .catch(err => console.log(err));
+}, [form.state]);
+
+// Fetch cities when district changes
+useEffect(() => {
+  if (!form.state || !form.district) return;
+
+  fetch(`http://localhost:5000/api/locations/cities/${form.state}/${form.district}`)
+    .then(res => res.json())
+    .then(data => setCities(data))
+    .catch(err => console.log(err));
+}, [form.state, form.district]);
+
+
+
+
+
+
+//const [editIndex, setEditIndex] = useState(null);
 
   return (
     <>
@@ -191,7 +181,8 @@ const [editIndex, setEditIndex] = useState(null);
       <div className="tender-wrapper">
         <div className="tender-card">
           <h2 className="tender-title">
-            {editIndex !== null ? "Edit Tender" : "Tender Filling Form"}
+            {editId ? "Edit Tender" : "Tender Filling Form"}
+
           </h2>
 
           <div className="tender-grid">
@@ -250,74 +241,58 @@ const [editIndex, setEditIndex] = useState(null);
               />
             </div>
 
-            {/* STATE */}
-            <div>
-              <label>State</label>
-              <select
-                name="state"
-                value={form.state}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    state: e.target.value,
-                    district: "",
-                    city: "",
-                  })
-                }
-              >
-                <option value="">Select State</option>
-                {Object.keys(locationData).map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
+           {/* ===== STATE ===== */}
+{/* ===== STATE ===== */}
+<div>
+  <label>State *</label>
+  <select
+  name="state"
+  value={form.state}
+  onChange={(e) => {
+    const state = e.target.value;
+    setForm({ ...form, state, district: "", city: "" });
+  }}
+>
+  <option value="">Select State</option>
+  {states.map((s) => (
+    <option key={s} value={s}>{s}</option>
+  ))}
+</select>
+</div>
 
-            {/* DISTRICT */}
-            <div>
-              <label>District</label>
-              <select
-                name="district"
-                value={form.district}
-                disabled={!form.state}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    district: e.target.value,
-                    city: "",
-                  })
-                }
-              >
-                <option value="">Select District</option>
-                {form.state &&
-                  Object.keys(locationData[form.state]).map((dist) => (
-                    <option key={dist} value={dist}>
-                      {dist}
-                    </option>
-                  ))}
-              </select>
-            </div>
+{/* ===== DISTRICT ===== */}
+<div>
+  <label>District *</label>
+  <select
+  name="district"
+  value={form.district}
+  onChange={(e) => {
+    const district = e.target.value;
+    setForm({ ...form, district, city: "" });
+  }}
+>
+  <option value="">Select District</option>
+  {districts.map((d) => (
+    <option key={d} value={d}>{d}</option>
+  ))}
+</select>
+</div>
 
-            {/* CITY / TALUKA */}
-            <div>
-              <label>City / Taluka</label>
-              <select
-                name="city"
-                value={form.city}
-                disabled={!form.district}
-                onChange={handleChange}
-              >
-                <option value="">Select City / Taluka</option>
-                {form.state &&
-                  form.district &&
-                  locationData[form.state][form.district].map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-              </select>
-            </div>
+{/* ===== CITY ===== */}
+<div>
+  <label>City / Taluka *</label>
+ <select
+  name="city"
+  value={form.city}
+  onChange={(e) => setForm({ ...form, city: e.target.value })}
+>
+  <option value="">Select City / Taluka</option>
+  {cities.map((c) => (
+    <option key={c} value={c}>{c}</option>
+  ))}
+</select>
+</div>
+
 
             {/* PINCODE */}
             <div>
@@ -477,7 +452,7 @@ const [editIndex, setEditIndex] = useState(null);
 
           <div className="tender-btn">
             <button onClick={handleSubmit}>
-              {editIndex !== null ? "Update Tender" : "Submit Tender"}
+              {editId ? "Update Tender" : "Submit Tender"}
             </button>
           </div>
         </div>

@@ -5,6 +5,11 @@ import TenderForm from "./components/Tender/TenderForm";
 import Report from "./components/Report/Report";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Profile from "./components/Profile/Profile"; // ✅ NEW
+import Pending from "./pages/Pending";
+import Rejected from "./pages/Rejected";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+
+
 
 function App() {
   return (
@@ -16,6 +21,15 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+         {/* Status pages */}
+  <Route path="/pending" element={<Pending />} />
+  <Route path="/rejected" element={<Rejected />} />
+
+  <Route path="/admin-dashboard" element={<AdminDashboard />} />
+
+      
+
 
         {/* 🔒 Protected routes */}
         <Route

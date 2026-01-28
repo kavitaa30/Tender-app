@@ -10,18 +10,24 @@ const Report = () => {
 
   // Fetch tenders from backend
   useEffect(() => {
-    const fetchTenders = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/tenders");
-        const tenders = await res.json();
-        setData(tenders);
-      } catch (err) {
-        console.error("Error fetching tenders:", err);
-      }
-    };
+  const userId = localStorage.getItem("userId");
+  if (!userId) return;
 
-    fetchTenders();
-  }, []);
+  const fetchTenders = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/tenders/${userId}`
+      );
+      const tenders = await res.json();
+      setData(tenders);
+    } catch (err) {
+      console.error("Error fetching tenders:", err);
+    }
+  };
+
+  fetchTenders();
+}, []);
+
 
   const handleEdit = (id) => {
     // Save the tender ID to edit

@@ -36,19 +36,28 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ msg: "Email and password required" });
-    }
-
     const user = await User.findOne({ email, password });
 
     if (!user) {
       return res.status(401).json({ msg: "Invalid email or password" });
     }
 
-    res.json(user);
+    // 🔴 USER STATUS CHECK
+    if (user.role === "user" && user.status === "Pending") {
+      return res.status(403).json({ msg: "Waiting for admin approval" });
+    }
+
+    if (user.role === "user" && user.status === "Rejected") {
+      return res.status(403).json({ msg: "Your request is rejected" });
+    }
+
+    res.json({
+      _id: user._id,
+      role: user.role,
+      status: user.status,
+      fullName: user.fullName
+    });
   } catch (err) {
-    console.log("LOGIN ERROR:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -80,6 +89,32 @@ router.delete("/:id", async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
   res.json({ msg: "User deleted" });
 });
+
+
+// GET ALL USERS (except admin)
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({ role: "user" });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+router.put("/approve/:id", async (req, res) => {
+  await User.findByIdAndUpdate(req.params.id, {
+    status: "Approved"
+  });
+  res.json({ msg: "User approved" });
+});
+
+router.put("/reject/:id", async (req, res) => {
+  await User.findByIdAndUpdate(req.params.id, {
+    status: "Rejected"
+  });
+  res.json({ msg: "User rejected" });
+});
+
 
 
 

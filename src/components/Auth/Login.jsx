@@ -31,9 +31,28 @@ const Login = () => {
         return;
       }
 
-      // ✅ Save _id in localStorage
+      // 🔹 Save user data
       localStorage.setItem("userId", data._id);
-      navigate("/tender"); // direct navigate to tender
+      localStorage.setItem("role", data.role);
+       localStorage.setItem("status", data.status);
+
+
+      // 🔹 ROLE BASED NAVIGATION
+      if (data.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        // user
+        if (data.status === "Pending") {
+          alert("Waiting for admin approval");
+          navigate("/pending");
+        } else if (data.status === "Rejected") {
+          alert("Your request is rejected");
+          navigate("/rejected");
+        } else {
+          // Approved
+          navigate("/tender");
+        }
+      }
     } catch (err) {
       alert("Server error");
     }
@@ -58,6 +77,7 @@ const Login = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+
             <input
               type="password"
               placeholder="Password"

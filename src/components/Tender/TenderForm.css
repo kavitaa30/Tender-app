@@ -180,3 +180,16 @@ body {
   letter-spacing: 0.4px;
 }
 
+
+/* 🔥 FIX FOR SELECT DROPDOWN ISSUE */
+.tender-grid select {
+  padding-right: 14px;
+  line-height: normal;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+/* 🔥 FIX FOR SELECT OPTIONS RENDERING */
+.tender-grid select option {
+  padding: 8px;
+  border-radius: 0;
+}

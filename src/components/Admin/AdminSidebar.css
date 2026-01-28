@@ -1,0 +1,42 @@
+.admin-sidebar {
+  width: 230px;
+  height: 100vh;
+ 
+  color: white;
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+   background: linear-gradient(
+    90deg,
+    rgba(15, 28, 63, 0.95),
+    rgba(30, 58, 138, 0.95)
+  );
+}
+
+.admin-logo {
+  margin-bottom: 40px;
+}
+
+.admin-link {
+  display: block;
+  color: white;
+  text-decoration: none;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.admin-link.active {
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+.admin-logout {
+  margin-top: 40px;
+  width: 100%;
+  padding: 8px;
+  background: #ef4444;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
