@@ -31,7 +31,7 @@ const Register = () => {
       return;
     }
     if (!mobileRegex.test(form.mobile)) {
-  alert("Mobile number must be 10 digits");
+  alert("Mobile number is not valid");
   return;
 }
 

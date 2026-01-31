@@ -11,6 +11,8 @@ const mobileRegex = /^[5-9]\d{9}$/;
 
 const TenderForm = () => {
   const navigate = useNavigate();
+    const editId = localStorage.getItem("editId");
+  
 
   const [locationData, setLocationData] = useState({});
   const [states, setStates] = useState([]);
@@ -111,8 +113,6 @@ const TenderForm = () => {
   }
 };
 
-
-
 const [form, setForm] = useState(initialForm);
 useEffect(() => {
   if (!editId) return;
@@ -123,10 +123,13 @@ useEffect(() => {
         `http://localhost:5000/api/tenders/single/${editId}`
       );
       const data = await res.json();
+
       setForm({
-  ...initialForm,
-  ...data
-});
+        ...initialForm,
+        ...data,
+        license: data.license === true ? "Yes" : data.license,
+        gst: data.gst === true ? "Yes" : data.gst,
+      });
 
     } catch (err) {
       console.log(err);
@@ -134,7 +137,8 @@ useEffect(() => {
   };
 
   fetchTender();
-}, []);
+}, [editId]);
+
 
 
 // ======================== STATES ========================
